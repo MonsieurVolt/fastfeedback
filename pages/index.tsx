@@ -1,41 +1,29 @@
-import { useAuth } from "lib/auth";
 import Head from "next/head";
-import styles from "../styles/Home.module.css";
-export default function Home() {
-	const auth = useAuth();
-	console.log(auth?.user?.email);
-	console.log(auth);
-	return (
-		<div className={styles.container}>
-			<Head>
-				<title>Create Next App</title>
-				<link rel="icon" href="/favicon.ico" />
-			</Head>
+import { Button, Heading, Text, Code } from "@chakra-ui/react";
 
-			<main className={styles.main}>
-				{!auth.user && (
-					<button onClick={() => auth.signinWithGitHub()}>Sign In</button>
-				)}
-				<div>{auth?.user?.email}</div>
-				{auth.user && (
-					<button onClick={() => auth.signout()}>Sign out</button>
+import { useAuth } from "lib/auth";
+
+const Home = () => {
+	const auth = useAuth();
+
+	return (
+		<div className="container">
+			<Head>
+				<title>Fast Feedback</title>
+			</Head>
+			<main>
+				<Heading>Fast Feedback</Heading>
+				<Text>
+					Current user: <Code>{auth.user ? auth.user.email : "None"}</Code>
+				</Text>
+				{auth.user ? (
+					<Button onClick={(e) => auth.signout()}>Sign Out</Button>
+				) : (
+					<Button onClick={(e) => auth.signinWithGitHub()}>Sign In</Button>
 				)}
 			</main>
-
-			<footer className={styles.footer}>
-				<a
-					href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-					target="_blank"
-					rel="noopener noreferrer"
-				>
-					Powered by{" "}
-					<img
-						src="/vercel.svg"
-						alt="Vercel Logo"
-						className={styles.logo}
-					/>
-				</a>
-			</footer>
 		</div>
 	);
-}
+};
+
+export default Home;

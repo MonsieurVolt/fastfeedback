@@ -1,6 +1,9 @@
 {
 	"compilerOptions": {
 		"baseUrl": ".",
+		"paths": {
+			"@/design-system/*": ["components/design-system/*"]
+		},
 		"target": "es5",
 		"lib": ["dom", "dom.iterable", "esnext"],
 		"allowJs": true,
