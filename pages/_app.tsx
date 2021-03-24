@@ -1,11 +1,13 @@
-import { ThemeProvider, CSSReset } from "@chakra-ui/react";
+import { ChakraProvider, CSSReset } from "@chakra-ui/react";
 import { Global, css } from "@emotion/react";
+import { Props } from "framer-motion/types/types";
 
 import { AuthProvider } from "lib/auth";
-import React from "react";
+import { AppProps } from "next/dist/next-server/lib/router/router";
+import React, { Component, ComponentProps } from "react";
 import customTheme from "styles/theme";
 
-const GlobalStyle = ({ children }: { children?: React.ReactChildren }) => {
+const GlobalStyle: React.FC = ({ children }) => {
 	return (
 		<>
 			<CSSReset />
@@ -27,14 +29,15 @@ const GlobalStyle = ({ children }: { children?: React.ReactChildren }) => {
 	);
 };
 
-const App = ({ Component, pageProps }) => {
+const App: React.FC<AppProps> = ({ Component, pageProps }) => {
 	return (
-		<ThemeProvider theme={customTheme}>
+		<ChakraProvider theme={customTheme}>
 			<AuthProvider>
-				<GlobalStyle />
-				<Component {...pageProps} />
+				<GlobalStyle>
+					<Component {...pageProps} />
+				</GlobalStyle>
 			</AuthProvider>
-		</ThemeProvider>
+		</ChakraProvider>
 	);
 };
 

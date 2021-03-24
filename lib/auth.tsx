@@ -1,38 +1,36 @@
-import React, {
-	useState,
-	useEffect,
-	useContext,
-	createContext,
-	ProviderProps,
-} from "react";
+import React, { useState, useEffect, useContext, createContext } from "react";
 import firebase from "./firebase";
 import { createUser } from "./db";
 interface ContextInterface {
-	user: UserDataBase;
-	signinWithGitHub: () => Promise<false | UserDataBase>;
-	signout: () => Promise<false | UserDataBase>;
+	user: dbUser | false;
+	signinWithGitHub: () => Promise<dbUser | false>;
+	signout: () => Promise<false | dbUser>;
 }
-const authContext = createContext<ContextInterface>(null);
+const authContext = createContext<ContextInterface>({
+	user: false,
+	signinWithGitHub: async () => false,
+	signout: async () => false,
+});
 
-export function AuthProvider({ children }) {
+export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 	const auth = useProvideAuth();
 	return <authContext.Provider value={auth}>{children}</authContext.Provider>;
-}
+};
 
 export const useAuth = () => {
 	return useContext(authContext);
 };
 
 function useProvideAuth(): ContextInterface {
-	const [user, setUser] = useState(null);
+	const [user, setUser] = useState<dbUser | false>(false);
 
 	const handleUser = (
-		rawUser: firebase.User | false
-	): UserDataBase | false => {
+		rawUser: firebase.User | false | null
+	): dbUser | false => {
 		if (rawUser) {
 			const user = formatUser(rawUser);
 
-			createUser(user.uid, user);
+			createUser(user);
 			setUser(user);
 			return user;
 		} else {
@@ -41,14 +39,14 @@ function useProvideAuth(): ContextInterface {
 		}
 	};
 
-	const signinWithGitHub = () => {
+	const signinWithGitHub = async () => {
 		return firebase
 			.auth()
 			.signInWithPopup(new firebase.auth.GithubAuthProvider())
-			.then((response) => handleUser(response.user));
+			.then((response) => handleUser(response.user || false));
 	};
 
-	const signout = () => {
+	const signout = async () => {
 		return firebase
 			.auth()
 			.signOut()
@@ -68,12 +66,12 @@ function useProvideAuth(): ContextInterface {
 	};
 }
 
-const formatUser = (user: firebase.User): UserDataBase => {
+const formatUser = (user: firebase.User): dbUser => {
 	return {
 		uid: user.uid,
-		email: user.email,
-		name: user.displayName,
-		provider: user.providerData[0].providerId,
-		photoUrl: user.photoURL,
+		email: user.email || "",
+		name: user.displayName || "",
+		provider: user.providerData,
+		photoUrl: user.photoURL || "",
 	};
 };
