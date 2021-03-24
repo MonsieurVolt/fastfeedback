@@ -1,9 +1,12 @@
 import firebase from "./firebase";
 
 const firestore = firebase.firestore();
-export const createUser = (uid: string, data: UserDataBase) => {
+export const createUser = (data: dbUser) => {
 	return firestore
 		.collection("users")
-		.doc(uid)
-		.set({ uid, ...data }, { merge: true });
+		.doc(data.uid)
+		.set({ ...data }, { merge: true });
+};
+export const createSite = (data: userCreatingSite) => {
+	return firestore.collection("sites").add(data);
 };
